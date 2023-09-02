@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 
 import type { Request, Response, NextFunction } from "express";
+import ApiResponse from "../lib/api-response";
+import { getFromObject } from "../lib/utils";
+import { tokenSchema } from "../lib/schema";
 
 type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS" | "PATCH";
 
@@ -24,7 +27,50 @@ class RoleAccess<T> {
   }
 
   guard() {
-    return (req: Request, res: Response, next: NextFunction) => {};
+    return (req: Request, res: Response, next: NextFunction) => {
+      const { baseUrl, method } = req;
+      const token = getFromObject(res, "token");
+      const config = this.config.find(
+        (con) => con.method === method && con.path === baseUrl
+      );
+
+      if (!config) {
+        next();
+        return;
+      }
+      if (!token) {
+        const response = new ApiResponse(
+          "No auth token present in header",
+          401,
+          null,
+          null
+        );
+        res.status(response.statusCode).send(response);
+        return;
+      }
+
+      const authTokenInfo = tokenSchema.parse(this.verify(token));
+
+      if (authTokenInfo.role === config.role) {
+        next();
+        return;
+      }
+
+      if (this.options.cookieBased) {
+        // implement cookie based authentication here...
+      }
+
+      res
+        .status(403)
+        .send(
+          new ApiResponse(
+            "Missing permission to access this endpoint",
+            403,
+            null,
+            null
+          )
+        );
+    };
   }
 
   sign(obj: Object) {
