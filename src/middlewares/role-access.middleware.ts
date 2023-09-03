@@ -7,7 +7,7 @@ import { tokenSchema } from "../lib/schema";
 
 type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS" | "PATCH";
 
-interface PathConfig<T> {
+export interface PathConfig<T> {
   path: string;
   role: T;
   method: HttpMethods;

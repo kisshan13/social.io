@@ -54,20 +54,20 @@ const userSchema = new Schema(
     timestamps: true,
     toJSON: {
       virtuals: true,
-    },         
+    },
   }
-); 
+);
 
 userSchema.virtual("followersCount").get(function () {
-  return this.followers.length;
+  return this.followers?.length;
 });
 
 userSchema.virtual("followingCount").get(function () {
-  return this.following.length;
+  return this.following?.length;
 });
 
 userSchema.virtual("postsCount").get(function () {
-  return this.posts.length;
+  return this.posts?.length;
 });
 
 const User = database.model("User", userSchema);
