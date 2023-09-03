@@ -1,7 +1,7 @@
 type keys = "token" | "uuid";
 
 export function getFromObject(obj: Object, key: keys) {
-  return Object.getOwnPropertyDescriptor(obj, key)?.value;
+  return Object.getOwnPropertyDescriptor(obj, key)?.value as string;
 }
 
 export function addToObject(obj: Object, key: keys, value: string) {

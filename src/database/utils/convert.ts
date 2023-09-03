@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 function convertToObjectId(id: string) {
-  console.log(id.length);
+  console.log(id);
   return Types.ObjectId.createFromHexString(id);
 }
 

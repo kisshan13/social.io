@@ -47,8 +47,20 @@ const getUser = async (
   return user;
 };
 
+const generateUserProfile = async ({ id }: { id: string }) => {
+  const user = await User.findById(convertToObjectId(id))
+    // .populate({
+    //   path: "posts",
+    //   options: { sort: { createdAt: -1 }, limit: 10 },
+    // })
+    .select("-followers -following -_v -password ");
+
+  return user?.toJSON();
+};
+
 export const UserStore = {
   create: createUser,
   update: updateUser,
   get: getUser,
+  genProfile: generateUserProfile,
 };

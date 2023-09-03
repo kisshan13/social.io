@@ -52,6 +52,7 @@ const login = requestHandler(async (req, res) => {
     "email",
     "verified",
   ]);
+  console.log(user);
 
   if (tokens.compare(user?.password || "", password)) {
     const token = tokens.sign({
@@ -65,6 +66,10 @@ const login = requestHandler(async (req, res) => {
   } else {
     res.status(401).json(new ApiResponse("Wrong Credentials", 401, null, null));
   }
+});
+
+const forgotPassword = requestHandler(async (req, res) => {
+  // Handle otp send process and other stuff.. FUTURE INTEGRATION
 });
 
 export const authController = {
