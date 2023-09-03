@@ -1,4 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
+import { ZodError } from "zod";
+import { errors } from "../services/errors.service";
+import ApiResponse from "../lib/api-response";
+import mongoose from "mongoose";
 
 function errorHandler(
   err: Error,
@@ -6,7 +10,24 @@ function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  res.json(500).json({
+  if (err instanceof ZodError) {
+    const response = errors.zod(err);
+
+    res.status(422).send(new ApiResponse(response, 422, null));
+    return;
+  }
+
+  if (err instanceof mongoose.mongo.MongoServerError) {
+    const response = errors.mongo(err);
+
+    res
+      .status(response.status)
+      .json(new ApiResponse(response.message, response.status, null));
+
+    return;
+  }
+
+  res.status(500).json({
     message: err.message,
     cause: err.cause,
     stack: err.stack,

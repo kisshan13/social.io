@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import type { Request, Response, NextFunction } from "express";
 import ApiResponse from "../lib/api-response";
-import { getFromObject } from "../lib/utils";
+import { addToObject, getFromObject } from "../lib/utils";
 import { tokenSchema } from "../lib/schema";
 
 type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS" | "PATCH";
@@ -28,10 +28,10 @@ class RoleAccess<T> {
 
   guard() {
     return (req: Request, res: Response, next: NextFunction) => {
-      const { baseUrl, method } = req;
+      const { originalUrl, method } = req;
       const token = getFromObject(res, "token");
       const config = this.config.find(
-        (con) => con.method === method && con.path === baseUrl
+        (con) => con.method === method && con.path === originalUrl
       );
 
       if (!config) {
@@ -50,7 +50,7 @@ class RoleAccess<T> {
       }
 
       const authTokenInfo = tokenSchema.parse(this.verify(token));
-
+      addToObject(res, "uuid", authTokenInfo.uuid);
       if (authTokenInfo.role === config.role) {
         next();
         return;

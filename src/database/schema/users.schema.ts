@@ -1,5 +1,6 @@
 import mongoose, { Schema, get } from "mongoose";
 import database from "../database";
+import { boolean } from "zod";
 
 const userSchema = new Schema(
   {
@@ -38,6 +39,10 @@ const userSchema = new Schema(
       type: String,
       default: "Public",
     },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
     bio: {
       type: String,
     },
@@ -45,8 +50,13 @@ const userSchema = new Schema(
       type: String,
     },
   },
-  { timestamps: true }
-);
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },         
+  }
+); 
 
 userSchema.virtual("followersCount").get(function () {
   return this.followers.length;
@@ -56,7 +66,7 @@ userSchema.virtual("followingCount").get(function () {
   return this.following.length;
 });
 
-userSchema.virtual("posts").get(function () {
+userSchema.virtual("postsCount").get(function () {
   return this.posts.length;
 });
 
